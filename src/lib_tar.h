@@ -2,7 +2,6 @@
 #define LIB_TAR_H
 
 #include <stdlib.h>
-#include <stddef.h>
 #include <stdint.h>
 #include <unistd.h>
 

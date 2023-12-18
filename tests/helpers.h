@@ -38,12 +38,19 @@ void test_read_file(int fd, char *path, size_t offset, int buf_size, int expecte
 	cr_assert_eq(ret, expected, "read_file('%s') failed", path);
 	if (ret == expected && ret >= 0)
 	{
-		int expected_len = strlen(expected_buf);
+		size_t expected_len = strlen(expected_buf);
 		cr_assert_eq(len, expected_len, "read_file('%s') failed", path);
-		for (int i = 0; i < buf_size; i++)
+		if (len != expected_len)
+			return;
+		for (size_t i = 0; i < expected_len; i++)
+		{
 			cr_assert_eq(buf[i], expected_buf[i],
-						 "read_file('%s') failed at i=%d\n\texpected: '%s'\n\tgot: '%s' - because: '%c' != '%c'",
-						 path, i, expected_buf, buf, buf[i], expected_buf[i]);
+						 "read_file('%s') failed\n"
+						 "\texpected: '%s'\n"
+						 "\tresult: '%s'\n"
+						 "at index: %ld -> '%c' != '%c'",
+						 path, expected_buf, buf, i, expected_buf[i], buf[i]);
+		}
 	}
 
 	free(buf);
@@ -66,6 +73,5 @@ void test_list(int fd, char *path, int expected, char *expected_entries[])
 			cr_assert_str_eq(entries[i], expected_entries[i], "list('%s') failed", path);
 	}
 }
-
 
 #endif // HELPERS_H

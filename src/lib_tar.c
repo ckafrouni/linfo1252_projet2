@@ -36,7 +36,6 @@ int check_archive(int tar_fd)
         }
         tar_header_t *header = &(header_result->header);
         count++;
-        // printf("%d %s\n", header->typeflag, header->name);
 
         skip_file_content(tar_fd, header);
     }
@@ -244,15 +243,15 @@ ssize_t read_file(int tar_fd, char *path, size_t offset, uint8_t *dest, size_t *
     }
     lseek(tar_fd, offset, SEEK_CUR);
 
-    int read_size = size - offset;
-    int rest = read_size - *len;
-    if (rest < 0)
+    ssize_t read_size = size - offset;
+    ssize_t remaining = read_size - *len;
+    if (remaining < 0)
     {
         *len = read_size;
-        rest = 0;
+        remaining = 0;
     }
 
     read(tar_fd, dest, *len);
     lseek(tar_fd, 0, SEEK_SET);
-    return rest;
+    return remaining;
 }

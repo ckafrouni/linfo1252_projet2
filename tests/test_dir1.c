@@ -4,7 +4,7 @@
 #include <criterion/criterion.h>
 
 #include "../src/lib_tar.h"
-#include "./helpers.h"
+#include "helpers.h"
 
 int fd;
 
@@ -52,13 +52,11 @@ Test(test_dir_tar, read_file_success)
 
 Test(test_dir_tar, read_file_success_with_bigger_buf)
 {
-	// TODO: fails
 	test_read_file(fd, "dir1/file1.txt", 0, 16, 0, "Hello, World!\n");
 }
 
 Test(test_dir_tar, read_file_offset)
 {
-	// TODO: fails
 	test_read_file(fd, "dir1/file1.txt", 1, 14, 0, "ello, World!\n");
 	test_read_file(fd, "dir1/file1.txt", 1, 12, 1, "ello, World!");
 	test_read_file(fd, "dir1/file1.txt", 13, 5, 0, "\n");

@@ -14,7 +14,8 @@ lib_tar.o: src/lib_tar.c src/lib_tar.h src/lib_tar_internal.h
 tests/bin:
 	mkdir -p $@
 
-tests/bin/%: tests/%.c lib_tar.o
+
+tests/bin/%: tests/%.c lib_tar.o tests/helpers.h
 	$(CC) $(CFLAGS) -o $@ $^ -lcriterion
 
 ##################

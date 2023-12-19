@@ -56,6 +56,30 @@ void test_read_file(int fd, char *path, size_t offset, int buf_size, int expecte
 	free(buf);
 }
 
+char *get_array_str(char *arr[], size_t len)
+{
+	char *str = (char *)malloc(sizeof(char) * 256);
+	strcpy(str, "[");
+	for (size_t i = 0; i < len; i++)
+	{
+		strcat(str, "\"");
+		strcat(str, arr[i]);
+		strcat(str, "\"");
+		if (i < len - 1)
+			strcat(str, ", ");
+	}
+	strcat(str, "]");
+	return str;
+}
+
+int compare_strings(const void *a, const void *b) 
+{ 
+	const char **ia = (const char **)a;
+	const char **ib = (const char **)b;
+	return strcmp(*ia, *ib);
+} 
+
+
 void test_list(int fd, char *path, int expected, char *expected_entries[])
 {
 	size_t no_entries = 10;
@@ -69,9 +93,14 @@ void test_list(int fd, char *path, int expected, char *expected_entries[])
 	if (expected)
 	{
 		cr_assert_eq(no_entries, expected, "list('%s') failed", path);
+
+		qsort(entries, no_entries, sizeof(char *), compare_strings);
+		qsort(expected_entries, no_entries, sizeof(char *), compare_strings);
+
 		for (size_t i = 0; i < no_entries; i++)
 			cr_assert_str_eq(entries[i], expected_entries[i], "list('%s') failed", path);
 	}
 }
+
 
 #endif // HELPERS_H

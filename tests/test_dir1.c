@@ -1,6 +1,6 @@
 /**
  * Test suite for the archive represented by the following tree:
- * 
+ *
  * tests/resources/test_dir1
  * ├── dir1
  * │   ├── file1.txt
@@ -16,7 +16,7 @@
  * ├── symlink2 -> dir2/file2.txt
  * ├── symlink_subdir1 -> dir1/subdir1
  * └── symlink_symlink_subdir1 -> symlink_subdir1
- * 
+ *
  * 6 directories, 8 files
  */
 
@@ -100,9 +100,9 @@ Test(TS_dir1, read_file_failure)
 
 Test(TS_dir1, list)
 {
-	char *list_dir1[] = {"dir1/file1.txt", "dir1/subdir1/", "dir1/file2.txt"};
+	char *list_dir1[] = {"dir1/subdir1/", "dir1/file2.txt", "dir1/file1.txt"};
 	char *list_dir2[] = {"dir2/file2.txt"};
-	char *list_dir1_subdir1[] = {"dir1/subdir1/subsubdir1/", "dir1/subdir1/subfile2.txt", "dir1/subdir1/subfile1.txt"};
+	char *list_dir1_subdir1[] = {"dir1/subdir1/subsubdir1/", "dir1/subdir1/subfile1.txt", "dir1/subdir1/subfile2.txt"};
 	char *list_dir1_subdir1_subsubdir1[] = {"dir1/subdir1/subsubdir1/.gitkeep"};
 
 	test_list(fd, "file0.txt", 0, NULL);

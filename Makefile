@@ -1,6 +1,14 @@
 CC := gcc
 CFLAGS := -g -Wall -Werror -Wextra
 
+SRC_DIR := src
+
+TESTS_DIR := tests
+TESTS_BIN_DIR := $(TESTS_DIR)/bin
+TESTS := $(wildcard $(TESTS_DIR)/*.c)
+TESTS_BINS := $(patsubst $(TESTS_DIR)/%.c,$(TESTS_BIN_DIR)/%,$(TESTS))
+
+
 ##################
 # Compilation
 ##################
@@ -8,41 +16,41 @@ TARGETS := lib_tar.o
 
 all: $(TARGETS)
 
-lib_tar.o: src/lib_tar.c src/lib_tar.h src/lib_tar_internal.h
-	$(CC) $(CFLAGS) -c $<
+lib_tar.o: $(SRC_DIR)/lib_tar.c $(SRC_DIR)/lib_tar.h $(SRC_DIR)/lib_tar_internal.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
-tests/bin:
-	mkdir -p $@
-
-
-tests/bin/%: tests/%.c lib_tar.o tests/helpers.h
+$(TESTS_BIN_DIR)/%: $(TESTS_DIR)/%.c lib_tar.o $(TESTS_DIR)/helpers.h
 	$(CC) $(CFLAGS) -o $@ $^ -lcriterion
+
+$(TESTS_BIN_DIR):
+	mkdir -p $@
 
 ##################
 # Submission
 ##################
-SUBMISSION_FILES := src/ tests/ Makefile
+SUBMISSION_FILES := $(SRC_DIR)/ $(TESTS_DIR)/ Makefile
 SUBMISSION_TAR := soumission.tar
 
 submit: $(SUBMISSION_FILES)
 	tar --posix --pax-option delete=".*" --pax-option delete="*time*" --no-xattrs --no-acl --no-selinux -c $^ > $(SUBMISSION_TAR)
 
 test_submit: submit
-	mkdir -p tests/bin/test_submit
-	tar -xf $(SUBMISSION_TAR) -C tests/bin/test_submit
-	$(MAKE) -C tests/bin/test_submit
-	$(MAKE) -C tests/bin/test_submit test
-	rm -rf tests/bin/test_submit
+	mkdir -p $(TESTS_BIN_DIR)/test_submit
+	tar -xf $(SUBMISSION_TAR) -C $(TESTS_BIN_DIR)/test_submit
+	$(MAKE) -C $(TESTS_BIN_DIR)/test_submit
+	$(MAKE) -C $(TESTS_BIN_DIR)/test_submit test
+	rm -rf $(TESTS_BIN_DIR)/test_submit
 
 ##################
 # Tests
-################## 
-test: all tests/bin tests/bin/test_dir1
-	@for test in tests/bin/*; do \
+##################
+test: all $(TESTS_BIN_DIR) $(TESTS_BIN_DIR) $(TESTS_BINS) 
+	@for test in $(TESTS_BINS); do \
 		./$$test --verbose --always-succeed -j1; \
 	done
 
 clean:
-	rm -rf lib_tar.o tests/bin $(SUBMISSION_TAR)
+	$(RM) lib_tar.o $(SUBMISSION_TAR)
+	$(RM) -r $(TESTS_BIN_DIR)
 
 .PHONY: clean test all

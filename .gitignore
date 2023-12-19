@@ -1,4 +1,6 @@
 bin/
-soumission.tar
-.vscode/
 *.o
+
+soumission.tar
+
+# .vscode/

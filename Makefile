@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS := -g -Wall -Werror -Wextra
+CFLAGS := -g -Wall -Werror -Wextra -std=c11
 
 SRC_DIR := src
 
@@ -56,4 +56,4 @@ clean:
 	$(RM) lib_tar.o $(SUBMISSION_TAR)
 	$(RM) -r $(TESTS_BIN_DIR)
 
-.PHONY: clean test all
+.PHONY: clean test all submit test_submit

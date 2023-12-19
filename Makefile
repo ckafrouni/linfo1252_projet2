@@ -45,12 +45,17 @@ test_submit: submit
 # Tests
 ##################
 test: all $(TESTS_BIN_DIR) $(TESTS_BIN_DIR) $(TESTS_BINS) 
-	@for test in $(TESTS_BINS); do \
+	@exit_code=0; \
+	for test in $(TESTS_BINS); do \
 		cd $(TESTS_DIR)/resources/$$(basename $$test) && \
 		tar --posix --pax-option delete=".*" --pax-option delete="*time*" --no-xattrs --no-acl --no-selinux -c * > ../../bin/$$(basename $$test).tar && \
 		cd - && \
-		./$$test --verbose --always-succeed -j1; \
-	done
+		./$$test --verbose -j1; \
+		if [ $$? -ne 0 ]; then \
+			exit_code=1; \
+		fi; \
+	done; \
+	exit $$exit_code
 
 clean:
 	$(RM) lib_tar.o $(SUBMISSION_TAR)

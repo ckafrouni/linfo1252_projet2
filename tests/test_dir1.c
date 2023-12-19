@@ -10,7 +10,7 @@ int fd;
 
 void setup(void)
 {
-	fd = open("tests/resources/dir1.tar", O_RDONLY);
+	fd = open("tests/bin/test_dir1.tar", O_RDONLY);
 	if (fd == -1)
 	{
 		perror("open(tar_file)");
@@ -23,14 +23,14 @@ void teardown(void)
 	close(fd);
 }
 
-TestSuite(test_dir_tar, .init = setup, .fini = teardown);
+TestSuite(TS_dir1, .init = setup, .fini = teardown);
 
-Test(test_dir_tar, check_archive)
+Test(TS_dir1, check_archive)
 {
-	test_check_archive(fd, "../resources/dir1.tar", 15);
+	test_check_archive(fd, "tests/bin/test_dir1.tar", 15);
 }
 
-Test(test_dir_tar, exists)
+Test(TS_dir1, exists)
 {
 	test_exists(fd, "file0.txt", 1, 1, 0, 0);
 	test_exists(fd, "dir1/", 1, 0, 1, 0);
@@ -43,32 +43,32 @@ Test(test_dir_tar, exists)
 	test_exists(fd, "symlink_subdir1/subfile1.txt", 0, 0, 0, 0);
 }
 
-Test(test_dir_tar, read_file_success)
+Test(TS_dir1, read_file_success)
 {
 	test_read_file(fd, "dir1/file1.txt", 0, 14, 0, "Hello, World!\n");
 	test_read_file(fd, "dir1/file1.txt", 0, 13, 1, "Hello, World!");
 	test_read_file(fd, "dir1/file1.txt", 0, 12, 2, "Hello, World");
 }
 
-Test(test_dir_tar, read_file_success_with_bigger_buf)
+Test(TS_dir1, read_file_success_with_bigger_buf)
 {
 	test_read_file(fd, "dir1/file1.txt", 0, 16, 0, "Hello, World!\n");
 }
 
-Test(test_dir_tar, read_file_offset)
+Test(TS_dir1, read_file_offset)
 {
 	test_read_file(fd, "dir1/file1.txt", 1, 14, 0, "ello, World!\n");
 	test_read_file(fd, "dir1/file1.txt", 1, 12, 1, "ello, World!");
 	test_read_file(fd, "dir1/file1.txt", 13, 5, 0, "\n");
 }
 
-Test(test_dir_tar, read_file_symlink)
+Test(TS_dir1, read_file_symlink)
 {
 	test_read_file(fd, "symlink1", 0, 14, 0, "Hello, World!\n");
 	test_read_file(fd, "symlink2", 0, 19, 8, "Hello, again!\nHow a");
 }
 
-Test(test_dir_tar, read_file_failure)
+Test(TS_dir1, read_file_failure)
 {
 	test_read_file(fd, "dir1/file1.txt", 14, 4, -2, NULL);
 
@@ -76,7 +76,7 @@ Test(test_dir_tar, read_file_failure)
 	test_read_file(fd, "dir2/", 0, 14, -1, NULL);
 }
 
-Test(test_dir_tar, list)
+Test(TS_dir1, list)
 {
 	char *list_dir1[] = {"dir1/file1.txt", "dir1/subdir1/", "dir1/file2.txt"};
 	char *list_dir2[] = {"dir2/file2.txt"};

@@ -46,6 +46,9 @@ test_submit: submit
 ##################
 test: all $(TESTS_BIN_DIR) $(TESTS_BIN_DIR) $(TESTS_BINS) 
 	@for test in $(TESTS_BINS); do \
+		cd $(TESTS_DIR)/resources/$$(basename $$test) && \
+		tar --posix --pax-option delete=".*" --pax-option delete="*time*" --no-xattrs --no-acl --no-selinux -c * > ../../bin/$$(basename $$test).tar && \
+		cd - && \
 		./$$test --verbose --always-succeed -j1; \
 	done
 

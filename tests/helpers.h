@@ -1,13 +1,13 @@
-#if !defined(HELPERS_H)
-#define HELPERS_H
+#ifndef __HELPERS_H__
+#define __HELPERS_H__
 
 #include <criterion/criterion.h>
+#include <criterion/assert.h>
+
 #include <stdlib.h>
 #include <string.h>
 
 #include "../src/lib_tar.h"
-
-#define COLORIZE_BLACK_ON_WHITE(str) "\033[30;47m" str "\033[0m"
 
 void test_check_archive(int fd, char *filename, int expected)
 {
@@ -22,9 +22,7 @@ void test_exists(int fd, char *path, int expected, int is_file_exp, int is_dir_e
 	if (expected)
 	{
 		cr_assert_eq(is_file(fd, path), is_file_exp, "is_file('%s') failed", path);
-
 		cr_assert_eq(is_dir(fd, path), is_dir_exp, "is_dir('%s') failed", path);
-
 		cr_assert_eq(is_symlink(fd, path), is_symlink_exp, "is_symlink('%s') failed", path);
 	}
 }
@@ -72,13 +70,12 @@ char *get_array_str(char *arr[], size_t len)
 	return str;
 }
 
-int compare_strings(const void *a, const void *b) 
-{ 
+int compare_strings(const void *a, const void *b)
+{
 	const char **ia = (const char **)a;
 	const char **ib = (const char **)b;
 	return strcmp(*ia, *ib);
-} 
-
+}
 
 void test_list(int fd, char *path, int expected, char *expected_entries[])
 {
@@ -97,10 +94,14 @@ void test_list(int fd, char *path, int expected, char *expected_entries[])
 		qsort(entries, no_entries, sizeof(char *), compare_strings);
 		qsort(expected_entries, no_entries, sizeof(char *), compare_strings);
 
-		for (size_t i = 0; i < no_entries; i++)
-			cr_assert_str_eq(entries[i], expected_entries[i], "list('%s') failed", path);
+		cr_assert(
+			strcmp(get_array_str(entries, no_entries), get_array_str(expected_entries, no_entries)) == 0,
+			"list('%s') failed\n"
+			"\texpected: %s\n"
+			"\tresult: %s\n",
+			path, get_array_str(expected_entries, no_entries), get_array_str(entries, no_entries)
+		);
 	}
 }
 
-
-#endif // HELPERS_H
+#endif // __HELPERS_H__

@@ -1,5 +1,5 @@
-#ifndef LIB_TAR_INTERNAL_H
-#define LIB_TAR_INTERNAL_H
+#ifndef __LIB_TAR_INTERNAL_H__
+#define __LIB_TAR_INTERNAL_H__
 
 #include <stdlib.h>
 #include <string.h>
@@ -143,4 +143,4 @@ tar_header_t *follow_symlinks(int tar_fd, tar_header_t *header)
     return header;
 }
 
-#endif // LIB_TAR_INTERNAL_H
+#endif // __LIB_TAR_INTERNAL_H__

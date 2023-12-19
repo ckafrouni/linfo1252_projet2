@@ -1,3 +1,25 @@
+/**
+ * Test suite for the archive represented by the following tree:
+ * 
+ * tests/resources/test_dir1
+ * ├── dir1
+ * │   ├── file1.txt
+ * │   ├── file2.txt
+ * │   └── subdir1
+ * │       ├── subfile1.txt
+ * │       ├── subfile2.txt
+ * │       └── subsubdir1
+ * ├── dir2
+ * │   └── file2.txt
+ * ├── file0.txt
+ * ├── symlink1 -> dir1/file1.txt
+ * ├── symlink2 -> dir2/file2.txt
+ * ├── symlink_subdir1 -> dir1/subdir1
+ * └── symlink_symlink_subdir1 -> symlink_subdir1
+ * 
+ * 6 directories, 8 files
+ */
+
 #include <stdio.h>
 #include <fcntl.h>
 

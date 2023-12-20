@@ -1,7 +1,8 @@
-#ifndef __LIB_TAR_H__
-#define __LIB_TAR_H__
+#ifndef LIB_TAR_H
+#define LIB_TAR_H
 
 #include <stdlib.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <unistd.h>
 
@@ -146,4 +147,4 @@ int list(int tar_fd, char *path, char **entries, size_t *no_entries);
  */
 ssize_t read_file(int tar_fd, char *path, size_t offset, uint8_t *dest, size_t *len);
 
-#endif // __LIB_TAR_H__
+#endif

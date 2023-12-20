@@ -1,64 +1,45 @@
 CC := gcc
-CFLAGS := -g -Wall -Werror -Wextra -std=c11
+CFLAGS := -g -Wall -Werror
 
-SRC_DIR := src
-
-TESTS_DIR := tests
-TESTS_BIN_DIR := $(TESTS_DIR)/bin
-TESTS := $(wildcard $(TESTS_DIR)/*.c)
-TESTS_BINS := $(patsubst $(TESTS_DIR)/%.c,$(TESTS_BIN_DIR)/%,$(TESTS))
-
-
-##################
-# Compilation
-##################
-TARGETS := lib_tar.o
-
-all: $(TARGETS)
-
-lib_tar.o: $(SRC_DIR)/lib_tar.c $(SRC_DIR)/lib_tar.h $(SRC_DIR)/lib_tar_internal.h
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(TESTS_BIN_DIR)/%: $(TESTS_DIR)/%.c lib_tar.o $(TESTS_DIR)/helpers.h
-	$(CC) $(CFLAGS) -o $@ $^ -lcriterion
-
-$(TESTS_BIN_DIR):
-	mkdir -p $@
-
-##################
-# Submission
-##################
-SUBMISSION_FILES := $(SRC_DIR)/ $(TESTS_DIR)/ Makefile
+HEADERS := lib_tar.h
+SOURCES := lib_tar.c tests.c
 SUBMISSION_TAR := soumission.tar
+DIR := test_dir
+SUBMISSION_FILES := $(HEADERS) $(SOURCES) Makefile $(DIR) files.tar
+
+
+all: tests lib_tar.o
+
+lib_tar.o: lib_tar.c lib_tar.h
+	@$(CC) $(CFLAGS) -c $<
+
+tests: tests.c lib_tar.o
+	@$(CC) $(CFLAGS) -o tests $^
+
+clean:
+	rm -rf lib_tar.o tests soumission.tar test_dir.tar
 
 submit: $(SUBMISSION_FILES)
 	tar --posix --pax-option delete=".*" --pax-option delete="*time*" --no-xattrs --no-acl --no-selinux -c $^ > $(SUBMISSION_TAR)
 
-test_submit: submit
-	mkdir -p $(TESTS_BIN_DIR)/test_submit
-	tar -xf $(SUBMISSION_TAR) -C $(TESTS_BIN_DIR)/test_submit
-	$(MAKE) -C $(TESTS_BIN_DIR)/test_submit
-	$(MAKE) -C $(TESTS_BIN_DIR)/test_submit test
-	rm -rf $(TESTS_BIN_DIR)/test_submit
 
-##################
-# Tests
-##################
-test: all $(TESTS_BIN_DIR) $(TESTS_BIN_DIR) $(TESTS_BINS) 
-	@exit_code=0; \
-	for test in $(TESTS_BINS); do \
-		cd $(TESTS_DIR)/resources/$$(basename $$test) && \
-		tar --posix --pax-option delete=".*" --pax-option delete="*time*" --no-xattrs --no-acl --no-selinux -c * > ../../bin/$$(basename $$test).tar && \
-		cd - && \
-		./$$test --verbose -j1; \
-		if [ $$? -ne 0 ]; then \
-			exit_code=1; \
-		fi; \
-	done; \
-	exit $$exit_code
+simulate: TMP_DIR := $(shell mktemp -u)
+simulate: clean submit
+	mkdir $(TMP_DIR)
+	tar -xf $(SUBMISSION_TAR) -C $(TMP_DIR)
+	cd $(TMP_DIR) && make -s run
+	rm -rf $(TMP_DIR)
+	make -s clean
 
-clean:
-	$(RM) lib_tar.o $(SUBMISSION_TAR)
-	$(RM) -r $(TESTS_BIN_DIR)
+test: clean all
+	@cd $(DIR) && tar --posix --pax-option delete=".*" --pax-option delete="*time*" --no-xattrs --no-acl --no-selinux -c * > ../$(DIR).tar
+	@echo "\e[31m====================================\e[0m"
+	@echo "\e[31mTesting with \e[32m'$(DIR).tar'\e[0m"
+	@echo "\e[31m====================================\e[0m"
+	@./tests $(DIR).tar
+	@echo "\e[31m====================================\e[0m"
+run: test
+	@make -s clean
+	@rm -rf $(DIR).tar
 
-.PHONY: clean test all submit test_submit
+.PHONY: all clean run test submit simulate

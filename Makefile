@@ -2,6 +2,10 @@ CC := gcc
 CFLAGS := -g -Wall -Werror -Wextra -std=c11
 
 SRC_DIR := src
+INCLUDE_DIR := include
+BIN_DIR := bin
+
+BINS := $(BIN_DIR)/lib_tar.o
 
 TESTS_DIR := tests
 TESTS_BIN_DIR := $(TESTS_DIR)/bin
@@ -12,18 +16,20 @@ TESTS_BINS := $(patsubst $(TESTS_DIR)/%.c,$(TESTS_BIN_DIR)/%,$(TESTS))
 ##################
 # Compilation
 ##################
-TARGETS := lib_tar.o
+all: $(BIN_DIR) $(BINS)
 
-all: $(TARGETS)
-
-lib_tar.o: $(SRC_DIR)/lib_tar.c $(SRC_DIR)/lib_tar.h $(SRC_DIR)/lib_tar_internal.h
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(TESTS_BIN_DIR)/%: $(TESTS_DIR)/%.c lib_tar.o $(TESTS_DIR)/helpers.h
-	$(CC) $(CFLAGS) -o $@ $^ -lcriterion
+$(BIN_DIR):
+	mkdir -p $@
 
 $(TESTS_BIN_DIR):
 	mkdir -p $@
+
+$(BIN_DIR)/lib_tar.o: $(SRC_DIR)/lib_tar.c $(INCLUDE_DIR)/lib_tar.h $(INCLUDE_DIR)/lib_tar_internal.h
+	$(CC) $(CFLAGS) -c $< -o $@ -I$(INCLUDE_DIR)
+
+$(TESTS_BIN_DIR)/%: $(TESTS_DIR)/%.c $(BIN_DIR)/lib_tar.o $(TESTS_DIR)/helpers.h
+	$(CC) $(CFLAGS) -o $@ $^ -lcriterion -I$(INCLUDE_DIR)
+
 
 ##################
 # Submission
@@ -44,7 +50,7 @@ test_submit: submit
 ##################
 # Tests
 ##################
-test: all $(TESTS_BIN_DIR) $(TESTS_BIN_DIR) $(TESTS_BINS) 
+test: all $(TESTS_BIN_DIR) $(TESTS_BINS) 
 	@exit_code=0; \
 	for test in $(TESTS_BINS); do \
 		cd $(TESTS_DIR)/resources/$$(basename $$test) && \
@@ -58,7 +64,7 @@ test: all $(TESTS_BIN_DIR) $(TESTS_BIN_DIR) $(TESTS_BINS)
 	exit $$exit_code
 
 clean:
-	$(RM) lib_tar.o $(SUBMISSION_TAR)
-	$(RM) -r $(TESTS_BIN_DIR)
+	$(RM) $(SUBMISSION_TAR)
+	$(RM) -r $(TESTS_BIN_DIR) $(BIN_DIR)
 
 .PHONY: clean test all submit test_submit

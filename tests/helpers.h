@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../src/lib_tar.h"
+#include "lib_tar.h"
 
 void test_check_archive(int fd, char *filename, int expected)
 {

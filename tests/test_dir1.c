@@ -25,8 +25,8 @@
 
 #include <criterion/criterion.h>
 
-#include "../src/lib_tar.h"
-#include "helpers.h"
+#include "lib_tar.h"
+#include "./helpers.h"
 
 int fd;
 
